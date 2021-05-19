@@ -1,0 +1,4 @@
+---
+logstash_image:
+logstash_hostname:
+logstash_conf_dir:

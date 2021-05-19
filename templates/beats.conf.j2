@@ -1,0 +1,21 @@
+input { stdin { } }
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  if [@metadata][beat] in ["heartbeat", "metricbeat", "filebeat"] {
+    elasticsearch { 
+      hosts => ["{% for host in groups['elastic_cluster_hosts'] %}https://{{ host }}:9200, {% endfor %}"]
+      ssl.certificate_authorities: "{{ logstash_certs_dir }}/ca.crt"
+      ssl.certificate: "{{ logstash_certs_dir }}/{{ ansible_hostname }}.crt"
+      ssl.key: "{{ logstash_certs_dir }}/{{ ansible_hostname }}.key"
+      user => "{{ logstash_username }}"
+      password => "{{ logstash_password }}"
+      index => "%{[@metadata][beat]}-%{[@metadata][version]}"
+    }
+  }
+}
